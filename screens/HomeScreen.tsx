@@ -4,9 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 
 export default function HomeScreen() {
-  return(
-    <SafeAreaView >
-    <Text >HomeScreen</Text>
-    </SafeAreaView>
-  )
+  return (
+		<SafeAreaView>
+			<Text className="font-bold text-2xl">HomeScreen!!!!!</Text>
+		</SafeAreaView>
+	);
 }
