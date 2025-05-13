@@ -1,18 +1,44 @@
-import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
-import React from "react";
+import {
+	View,
+	Text,
+	TouchableOpacity,
+	Image,
+	TextInput,
+	Alert,
+} from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
 import { ArrowLeftIcon } from "react-native-heroicons/solid";
-
 import { RootStackParamList } from "../types/navigation";
 import { themeColors } from "../theme";
+import { loginUser } from "../utils/auth";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function LoginScreen() {
 	const navigation = useNavigation<NavigationProp>();
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+
+	const handleLogin = async () => {
+		try {
+			if (!email || !password) {
+				Alert.alert("Error", "Please fill in all fields");
+				return;
+			}
+
+			const success = await loginUser(email, password);
+			if (success) {
+				navigation.navigate("Home");
+			} else {
+				Alert.alert("Error", "Invalid email or password");
+			}
+		} catch (error) {
+			Alert.alert("Error", "An error occurred during login");
+		}
+	};
 
 	return (
 		<View
@@ -44,19 +70,26 @@ export default function LoginScreen() {
 					<TextInput
 						className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-6"
 						placeholder="email"
-						value={"yuchun@gmail.com"}
+						value={email}
+						onChangeText={setEmail}
+						keyboardType="email-address"
+						autoCapitalize="none"
 					/>
 					<Text className="text-gray-700 ml-4 mb-2">Password</Text>
 					<TextInput
 						className="p-4 bg-gray-100 text-gray-700 rounded-2xl"
 						secureTextEntry
 						placeholder="password"
-						value={"12345678"}
+						value={password}
+						onChangeText={setPassword}
 					/>
 					<TouchableOpacity className="flex items-end">
 						<Text className="text-gray-700 mb-5 mt-2">Forgot Password?</Text>
 					</TouchableOpacity>
-					<TouchableOpacity className="py-3 bg-yellow-400 rounded-xl mt-6 mb-4">
+					<TouchableOpacity
+						className="py-3 bg-yellow-400 rounded-xl mt-6 mb-4"
+						onPress={handleLogin}
+					>
 						<Text className="text-xl font-bold text-center text-gray-700">
 							Login
 						</Text>

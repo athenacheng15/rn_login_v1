@@ -1,18 +1,50 @@
-import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
-import React from "react";
+import {
+	View,
+	Text,
+	TouchableOpacity,
+	Image,
+	TextInput,
+	Alert,
+} from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
 import { ArrowLeftIcon } from "react-native-heroicons/solid";
-
 import { RootStackParamList } from "../types/navigation";
 import { themeColors } from "../theme";
+import { storeUser } from "../utils/auth";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function SignUpScreen() {
 	const navigation = useNavigation<NavigationProp>();
+	const [fullName, setFullName] = useState("");
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+
+	const handleSignUp = async () => {
+		try {
+			if (!fullName || !email || !password) {
+				Alert.alert("Error", "Please fill in all fields");
+				return;
+			}
+
+			await storeUser({ email, password });
+			Alert.alert("Success", "Account created successfully", [
+				{
+					text: "OK",
+					onPress: () => navigation.navigate("Login"),
+				},
+			]);
+		} catch (error) {
+			if (error instanceof Error && error.message === "Email already exists") {
+				Alert.alert("Error", "Email already exists");
+			} else {
+				Alert.alert("Error", "An error occurred during sign up");
+			}
+		}
+	};
 
 	return (
 		<View
@@ -43,23 +75,31 @@ export default function SignUpScreen() {
 					<Text className="text-gray-700 ml-4 mb-2">Full Name</Text>
 					<TextInput
 						className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-6"
-						placeholder="email"
-						value={"Yuchun Cheng"}
+						placeholder="Full Name"
+						value={fullName}
+						onChangeText={setFullName}
 					/>
 					<Text className="text-gray-700 ml-4 mb-2">Email Address</Text>
 					<TextInput
 						className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-6"
 						placeholder="email"
-						value={"yuchun@gmail.com"}
+						value={email}
+						onChangeText={setEmail}
+						keyboardType="email-address"
+						autoCapitalize="none"
 					/>
 					<Text className="text-gray-700 ml-4 mb-2">Password</Text>
 					<TextInput
 						className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-5"
 						secureTextEntry
 						placeholder="password"
-						value={"12345678"}
+						value={password}
+						onChangeText={setPassword}
 					/>
-					<TouchableOpacity className="py-3 bg-yellow-400 rounded-xl mt-6 mb-4">
+					<TouchableOpacity
+						className="py-3 bg-yellow-400 rounded-xl mt-6 mb-4"
+						onPress={handleSignUp}
+					>
 						<Text className="text-xl font-bold text-center text-gray-700">
 							Sign Up
 						</Text>
